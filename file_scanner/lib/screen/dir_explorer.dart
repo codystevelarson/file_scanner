@@ -96,7 +96,7 @@ class DirectoryExplorerState extends State<DirectoryExplorer> {
               onPressed: () => _findDirectories(
                 ScanType.text,
                 match: kScanMatches[ScanType.text]!,
-                exclude: ['Program Files'],
+                exclude: ['Program Files', 'System', 'Library', 'Applications'],
               ),
               icon: const Icon(Icons.text_fields),
             ),
@@ -104,7 +104,7 @@ class DirectoryExplorerState extends State<DirectoryExplorer> {
               onPressed: () => _findDirectories(
                 ScanType.image,
                 match: kScanMatches[ScanType.image]!,
-                exclude: ['Program Files'],
+                exclude: ['Program Files', 'System', 'Library', 'Applications'],
               ),
               icon: const Icon(Icons.image_search),
             ),
@@ -113,7 +113,12 @@ class DirectoryExplorerState extends State<DirectoryExplorer> {
                 _findDirectories(
                   ScanType.video,
                   match: kScanMatches[ScanType.video]!,
-                  exclude: ['Program Files'],
+                  exclude: [
+                    'Program Files',
+                    'System',
+                    'Library',
+                    'Applications'
+                  ],
                 );
               },
               icon: const Icon(Icons.video_file_sharp),
@@ -185,15 +190,24 @@ class DirectoryExplorerState extends State<DirectoryExplorer> {
                           _scans[index].directory.path.split('/').last,
                           style: _textSyle,
                         ),
-                        subtitle: Row(
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(
-                              Icons.file_present,
-                              color: kColorGrey,
-                            ),
                             Text(
-                              _scans[index].files.length.toString(),
-                              style: _textSyle,
+                              _scans[index].directory.path,
+                              style: _textSyle.copyWith(color: kColorGrey),
+                            ),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.file_present,
+                                  color: kColorGrey,
+                                ),
+                                Text(
+                                  _scans[index].files.length.toString(),
+                                  style: _textSyle,
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -228,6 +242,7 @@ class DirectoryExplorerState extends State<DirectoryExplorer> {
 
       /// Loop over disks
       for (var disk in disks) {
+        if (disk.mountpoints.isEmpty) continue;
         setState(() {
           _diskCount++;
           _currentDisk = disk.mountpoints[0].path;
